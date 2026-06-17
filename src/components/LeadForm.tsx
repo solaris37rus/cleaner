@@ -21,9 +21,35 @@ export default function LeadForm({ calculatorState, onBack }: LeadFormProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const formatPhoneNumber = (value: string) => {
+    const phone = value.replace(/\D/g, '');
+    if (!phone) return '';
+
+    // Auto-prepend 7 if starts with 9, 8, or 7
+    let normalized = phone;
+    if (phone[0] === '8' || phone[0] === '7') {
+      normalized = '7' + phone.slice(1);
+    } else if (phone[0] === '9') {
+      normalized = '7' + phone;
+    }
+
+    if (normalized.length <= 1) return `+7`;
+    if (normalized.length <= 4) return `+7 (${normalized.slice(1)}`;
+    if (normalized.length <= 7) return `+7 (${normalized.slice(1, 4)}) ${normalized.slice(4)}`;
+    if (normalized.length <= 9) return `+7 (${normalized.slice(1, 4)}) ${normalized.slice(4, 7)}-${normalized.slice(7)}`;
+    return `+7 (${normalized.slice(1, 4)}) ${normalized.slice(4, 7)}-${normalized.slice(7, 9)}-${normalized.slice(9, 11)}`;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'phone') {
+      // Only format if user is not deleting digits excessively or handle formatting
+      const formatted = formatPhoneNumber(value);
+      setFormData(prev => ({ ...prev, [name]: formatted }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const generateMessageText = () => {
