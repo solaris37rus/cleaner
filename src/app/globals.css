@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #10B981; /* Emerald 500 */
+  --color-primary-hover: #059669; /* Emerald 600 */
+  --color-secondary: #0ea5e9; /* Sky 500 */
+
+  --color-background: #ffffff;
+  --color-surface: #f8fafc; /* Slate 50 */
+  --color-surface-hover: #f1f5f9; /* Slate 100 */
+
+  --color-text-main: #1e293b; /* Slate 800 */
+  --color-text-muted: #64748b; /* Slate 500 */
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #1e293b;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      /* Keep light theme primarily as requested, but add basic dark mode support if needed */
+      --background: #0f172a;
+      --foreground: #f8fafc;
+    }
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-slate-800 antialiased;
+}
+
+/* Custom Utilities for Premium Look */
+.glass-effect {
+  @apply bg-white/80 backdrop-blur-md border border-white/20;
+}
+
+.premium-shadow {
+  box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 transition-colors;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 transition-colors;
+}
+
+.btn-outline {
+  @apply inline-flex items-center justify-center rounded-xl border-2 border-emerald-500 px-6 py-3 text-sm font-semibold text-emerald-600 hover:bg-emerald-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 transition-colors;
+}
+
+.section-padding {
+  @apply py-16 md:py-24;
+}
+
+.container-custom {
+  @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+}
