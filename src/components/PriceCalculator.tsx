@@ -1,10 +1,7 @@
-"use client";
-
 import { useState } from "react";
 import { Plus, Minus, Info, Calculator as CalcIcon } from "lucide-react";
 import LeadForm from "./LeadForm";
 
-// Types
 export type RoomType = "Квартира" | "Дом" | "Офис" | "Другое";
 export type ServiceType = "Поддерживающая" | "Генеральная" | "После ремонта" | "Мойка окон";
 
@@ -38,7 +35,14 @@ const INITIAL_EXTRAS: ExtraService[] = [
   { id: "bathroom", name: "Дополнительный санузел", price: 800, type: "count", count: 0, selected: false },
 ];
 
-export default function Calculator() {
+const PRICES: Record<string, { perSqm?: number; min?: number; price?: number }> = {
+  "Поддерживающая": { perSqm: 150, min: 3000 },
+  "Генеральная": { perSqm: 300, min: 5000 },
+  "После ремонта": { perSqm: 250, min: 6000 },
+  "Мойка окон": { price: 500 }, // per sash
+};
+
+export default function PriceCalculator() {
   const [roomType, setRoomType] = useState<RoomType>("Квартира");
   const [area, setArea] = useState<number>(50);
   const [serviceType, setServiceType] = useState<ServiceType>("Поддерживающая");
@@ -47,15 +51,7 @@ export default function Calculator() {
   const [extras, setExtras] = useState<ExtraService[]>(INITIAL_EXTRAS);
   const [showForm, setShowForm] = useState<boolean>(false);
 
-  // Constants for pricing
-  const PRICES: Record<string, { perSqm?: number; min?: number; price?: number }> = {
-    "Поддерживающая": { perSqm: 150, min: 3000 },
-    "Генеральная": { perSqm: 300, min: 5000 },
-    "После ремонта": { perSqm: 250, min: 6000 },
-    "Мойка окон": { price: 500 }, // per sash
-  };
-
-  // Calculate total derived from state directly
+  // Derived state calculation
   let currentTotal = 0;
   if (serviceType === "Мойка окон") {
     currentTotal = windowsCount * (PRICES["Мойка окон"].price || 0);
@@ -76,6 +72,7 @@ export default function Calculator() {
     currentTotal = currentTotal * 1.2;
   }
 
+  // Round to nearest 50 for cleaner numbers
   const total = Math.round(currentTotal / 50) * 50;
 
   const handleExtraToggle = (id: string) => {
@@ -108,26 +105,24 @@ export default function Calculator() {
     <section id="calculator" className="section-padding bg-slate-50">
       <div className="container-custom">
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center justify-center p-3 bg-emerald-100 rounded-2xl mb-4 text-emerald-600">
+          <div className="inline-flex items-center justify-center p-3 bg-primary-100 rounded-2xl mb-4 text-primary-600">
             <CalcIcon className="w-8 h-8" />
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
             Калькулятор стоимости
           </h2>
           <p className="text-lg text-slate-600">
-            Рассчитайте предварительную стоимость уборки и оставьте заявку
+            Рассчитайте предварительную стоимость уборки и оставьте онлайн заявку
           </p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left Column: Calculator Inputs */}
-          <div className="w-full lg:w-2/3 space-y-8 bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100">
+          {/* Inputs Section */}
+          <div className="w-full lg:w-2/3 space-y-8 bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200">
 
             {/* Room Type */}
             <div>
-              <label className="block text-sm font-semibold text-slate-900 mb-3">
-                Тип помещения
-              </label>
+              <label className="block text-sm font-semibold text-slate-900 mb-3">Тип помещения</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {(["Квартира", "Дом", "Офис", "Другое"] as RoomType[]).map((type) => (
                   <button
@@ -135,8 +130,8 @@ export default function Calculator() {
                     onClick={() => setRoomType(type)}
                     className={`py-3 px-4 rounded-xl text-sm font-medium border transition-all ${
                       roomType === type
-                        ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm"
-                        : "border-slate-200 bg-white text-slate-600 hover:border-emerald-200"
+                        ? "border-primary-500 bg-primary-50 text-primary-700 shadow-sm"
+                        : "border-slate-200 bg-white text-slate-600 hover:border-primary-200"
                     }`}
                   >
                     {type}
@@ -147,27 +142,23 @@ export default function Calculator() {
 
             {/* Service Type */}
             <div>
-              <label className="block text-sm font-semibold text-slate-900 mb-3">
-                Основная услуга
-              </label>
+              <label className="block text-sm font-semibold text-slate-900 mb-3">Основная услуга</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {(["Поддерживающая", "Генеральная", "После ремонта", "Мойка окон"] as ServiceType[]).map((type) => (
                   <button
                     key={type}
                     onClick={() => {
                       setServiceType(type);
-                      if (type === "Мойка окон" && windowsCount === 0) {
-                        setWindowsCount(1);
-                      }
+                      if (type === "Мойка окон" && windowsCount === 0) setWindowsCount(1);
                     }}
                     className={`py-3 px-4 rounded-xl text-sm font-medium border text-left transition-all ${
                       serviceType === type
-                        ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm"
-                        : "border-slate-200 bg-white text-slate-600 hover:border-emerald-200"
+                        ? "border-primary-500 bg-primary-50 text-primary-700 shadow-sm"
+                        : "border-slate-200 bg-white text-slate-600 hover:border-primary-200"
                     }`}
                   >
                     <div className="font-semibold mb-1">{type}</div>
-                    <div className={`text-xs ${serviceType === type ? "text-emerald-600/80" : "text-slate-400"}`}>
+                    <div className={`text-xs ${serviceType === type ? "text-primary-600/80" : "text-slate-400"}`}>
                       {type === "Мойка окон" ? "от 500 ₽/створка" : `от ${PRICES[type]?.perSqm} ₽/м²`}
                     </div>
                   </button>
@@ -175,13 +166,11 @@ export default function Calculator() {
               </div>
             </div>
 
-            {/* Area or Windows Count Input */}
+            {/* Size Input */}
             <div>
               {serviceType === "Мойка окон" ? (
                 <>
-                  <label className="block text-sm font-semibold text-slate-900 mb-3">
-                    Количество створок (шт)
-                  </label>
+                  <label className="block text-sm font-semibold text-slate-900 mb-3">Количество створок (шт)</label>
                   <div className="flex items-center gap-4">
                     <button
                       onClick={() => setWindowsCount(Math.max(1, windowsCount - 1))}
@@ -190,11 +179,9 @@ export default function Calculator() {
                       <Minus className="w-5 h-5" />
                     </button>
                     <input
-                      type="number"
-                      min="1"
-                      value={windowsCount}
+                      type="number" min="1" value={windowsCount}
                       onChange={(e) => setWindowsCount(Math.max(1, parseInt(e.target.value) || 1))}
-                      className="w-24 h-12 text-center text-lg font-bold text-slate-900 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                      className="w-24 h-12 text-center text-lg font-bold text-slate-900 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
                     />
                     <button
                       onClick={() => setWindowsCount(windowsCount + 1)}
@@ -206,28 +193,18 @@ export default function Calculator() {
                 </>
               ) : (
                 <>
-                  <label className="block text-sm font-semibold text-slate-900 mb-3">
-                    Площадь помещения (м²)
-                  </label>
+                  <label className="block text-sm font-semibold text-slate-900 mb-3">Площадь помещения (м²)</label>
                   <div className="flex items-center gap-4">
                     <input
-                      type="range"
-                      min="10"
-                      max="300"
-                      step="1"
-                      value={area}
+                      type="range" min="10" max="300" step="1" value={area}
                       onChange={(e) => setArea(parseInt(e.target.value))}
-                      className="flex-grow h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                      className="flex-grow h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary-500"
                     />
-                    <div className="relative">
-                      <input
-                        type="number"
-                        min="1"
-                        value={area}
-                        onChange={(e) => setArea(Math.max(1, parseInt(e.target.value) || 1))}
-                        className="w-24 h-12 px-3 text-center text-lg font-bold text-slate-900 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
-                      />
-                    </div>
+                    <input
+                      type="number" min="1" value={area}
+                      onChange={(e) => setArea(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="w-24 h-12 px-3 text-center text-lg font-bold text-slate-900 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                    />
                   </div>
                 </>
               )}
@@ -237,10 +214,8 @@ export default function Calculator() {
             <div>
               <label className="flex items-center gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
                 <input
-                  type="checkbox"
-                  checked={complexDirt}
-                  onChange={(e) => setComplexDirt(e.target.checked)}
-                  className="w-5 h-5 text-emerald-500 rounded border-slate-300 focus:ring-emerald-500"
+                  type="checkbox" checked={complexDirt} onChange={(e) => setComplexDirt(e.target.checked)}
+                  className="w-5 h-5 text-primary-500 rounded border-slate-300 focus:ring-primary-500"
                 />
                 <div>
                   <div className="font-semibold text-sm text-slate-900">Сложное загрязнение (+20%)</div>
@@ -251,23 +226,17 @@ export default function Calculator() {
 
             {/* Extras */}
             <div>
-              <label className="block text-sm font-semibold text-slate-900 mb-3">
-                Дополнительные услуги
-              </label>
+              <label className="block text-sm font-semibold text-slate-900 mb-3">Дополнительные услуги</label>
               <div className="space-y-3">
                 {extras.map(extra => (
                   <div key={extra.id} className="flex items-center justify-between p-3 sm:p-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">
                     <div className="flex items-center gap-3">
                       {extra.type === "boolean" ? (
                         <input
-                          type="checkbox"
-                          checked={extra.selected}
-                          onChange={() => handleExtraToggle(extra.id)}
-                          className="w-5 h-5 text-emerald-500 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+                          type="checkbox" checked={extra.selected} onChange={() => handleExtraToggle(extra.id)}
+                          className="w-5 h-5 text-primary-500 rounded border-slate-300 focus:ring-primary-500 cursor-pointer"
                         />
-                      ) : (
-                        <div className="w-5 h-5" /> // spacer
-                      )}
+                      ) : <div className="w-5 h-5" />}
                       <div>
                         <div className="text-sm font-medium text-slate-900 cursor-pointer" onClick={() => extra.type === "boolean" && handleExtraToggle(extra.id)}>
                           {extra.name}
@@ -275,13 +244,11 @@ export default function Calculator() {
                         <div className="text-xs text-slate-500">+{extra.price} ₽</div>
                       </div>
                     </div>
-
                     {extra.type === "count" && (
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => handleExtraCount(extra.id, false)}
-                          disabled={extra.count === 0}
-                          className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={() => handleExtraCount(extra.id, false)} disabled={extra.count === 0}
+                          className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 disabled:opacity-50"
                         >
                           <Minus className="w-4 h-4" />
                         </button>
@@ -298,18 +265,14 @@ export default function Calculator() {
                 ))}
               </div>
             </div>
-
           </div>
 
-          {/* Right Column: Total and Form */}
+          {/* Checkout Column */}
           <div className="w-full lg:w-1/3">
             <div className="sticky top-24 space-y-6">
-
               {!showForm ? (
-                <div className="bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-emerald-100">
-                  <h3 className="text-lg font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">
-                    Ваш заказ
-                  </h3>
+                <div className="bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-primary-100">
+                  <h3 className="text-lg font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">Ваш заказ</h3>
 
                   <div className="space-y-4 mb-6">
                     <div className="flex justify-between text-sm">
@@ -324,14 +287,12 @@ export default function Calculator() {
                       <span className="text-slate-500">{serviceType === "Мойка окон" ? "Створки:" : "Площадь:"}</span>
                       <span className="font-medium text-slate-900">{serviceType === "Мойка окон" ? `${windowsCount} шт` : `${area} м²`}</span>
                     </div>
-
                     {complexDirt && (
                       <div className="flex justify-between text-sm">
                         <span className="text-slate-500">Сложное загрязнение:</span>
-                        <span className="font-medium text-emerald-600">+20%</span>
+                        <span className="font-medium text-primary-600">+20%</span>
                       </div>
                     )}
-
                     {calculatorState.extras.length > 0 && (
                       <div className="pt-4 border-t border-slate-100">
                         <div className="text-xs text-slate-400 mb-2 font-semibold uppercase tracking-wider">Дополнительно:</div>
@@ -347,12 +308,10 @@ export default function Calculator() {
 
                   <div className="pt-6 border-t border-slate-100 mb-6">
                     <div className="text-sm text-slate-500 mb-1">Предварительная стоимость</div>
-                    <div className="text-3xl font-black text-emerald-600">
-                      ~ {total.toLocaleString('ru-RU')} ₽
-                    </div>
+                    <div className="text-3xl font-black text-primary-600">~ {total.toLocaleString('ru-RU')} ₽</div>
                     {serviceType !== "Мойка окон" && area * (PRICES[serviceType]?.perSqm || 0) < (PRICES[serviceType]?.min || 0) && (
                       <div className="text-xs text-slate-400 mt-2">
-                        * Применена минимальная стоимость выезда для этой услуги ({PRICES[serviceType]?.min} ₽)
+                        * Применена минимальная стоимость выезда ({PRICES[serviceType]?.min} ₽)
                       </div>
                     )}
                   </div>
@@ -360,27 +319,19 @@ export default function Calculator() {
                   <div className="bg-amber-50 p-3 rounded-xl flex gap-3 mb-6">
                     <Info className="w-5 h-5 text-amber-500 flex-shrink-0" />
                     <p className="text-xs text-amber-700 leading-relaxed">
-                      Стоимость предварительная. Итоговая цена зависит от площади, объёма работ, степени загрязнения, количества мебели и дополнительных пожеланий.
+                      Стоимость предварительная. Итоговая цена зависит от площади, объёма работ, степени загрязнения и дополнительных пожеланий.
                     </p>
                   </div>
 
-                  <button
-                    onClick={() => setShowForm(true)}
-                    className="btn-primary w-full py-4 text-base shadow-emerald-500/20"
-                  >
+                  <button onClick={() => setShowForm(true)} className="btn-primary w-full py-4 text-base">
                     Перейти к оформлению
                   </button>
                 </div>
               ) : (
-                <LeadForm
-                  calculatorState={calculatorState}
-                  onBack={() => setShowForm(false)}
-                />
+                <LeadForm calculatorState={calculatorState} onBack={() => setShowForm(false)} />
               )}
-
             </div>
           </div>
-
         </div>
       </div>
     </section>

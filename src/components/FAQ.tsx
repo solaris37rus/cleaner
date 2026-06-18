@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
@@ -34,7 +32,7 @@ export default function FAQ() {
   ];
 
   return (
-    <section id="faq" className="section-padding bg-slate-50">
+    <section id="faq" className="section-padding bg-white border-y border-slate-100">
       <div className="container-custom">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
@@ -50,7 +48,7 @@ export default function FAQ() {
             <div
               key={index}
               className={`bg-white border rounded-2xl overflow-hidden transition-colors ${
-                openIndex === index ? 'border-emerald-200 shadow-sm' : 'border-slate-200'
+                openIndex === index ? 'border-primary-200 shadow-sm ring-1 ring-primary-50' : 'border-slate-200 hover:border-slate-300'
               }`}
             >
               <button
@@ -61,8 +59,8 @@ export default function FAQ() {
                   {faq.question}
                 </span>
                 <ChevronDown
-                  className={`h-5 w-5 text-slate-400 flex-shrink-0 transition-transform duration-300 ${
-                    openIndex === index ? 'rotate-180 text-emerald-500' : ''
+                  className={`h-5 w-5 flex-shrink-0 transition-transform duration-300 ${
+                    openIndex === index ? 'rotate-180 text-primary-500' : 'text-slate-400'
                   }`}
                 />
               </button>
