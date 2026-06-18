@@ -46,7 +46,7 @@ npm run build
 1. Перейдите в **Workers & Pages** -> **Create application** -> **Pages** -> **Connect to Git**.
 2. Выберите ваш репозиторий.
 3. В разделе **Set up builds and deployments** укажите следующие параметры:
-   - **Framework preset:** `Vite` (или `None`)
+   - 🚨 **Framework preset:** `Vite` (ЕСЛИ У ВАС СТОЯЛ NEXT.JS - ОБЯЗАТЕЛЬНО ИЗМЕНИТЕ НА VITE! Иначе сборка упадет с ошибкой "Output directory dist not found")
    - **Build command:** `npm run build`
    - **Build output directory:** `dist`
 4. В разделе **Environment variables (advanced)** обязательно добавьте переменные:
