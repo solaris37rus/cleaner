@@ -58,21 +58,26 @@ npm run dev
 
 *Примечание:* Если отправка через API по какой-то причине не сработает, на сайте реализован fallback (запасной вариант) — клиенту будет предложено нажать кнопку, которая откроет Telegram с уже готовым текстом заявки для отправки вам напрямую (@gyrman37).
 
-## Деплой
+## Деплой на Cloudflare Pages
 
-Сайт готов к деплою на любую платформу, поддерживающую Next.js:
+Сайт полностью подготовлен для бесплатного и сверхбыстрого хостинга на **Cloudflare Pages**. Мы настроили Edge Runtime для API-роутов, чтобы форма заявки работала корректно.
 
-### Vercel (Рекомендуется)
-1. Зарегистрируйтесь на [Vercel](https://vercel.com/)
-2. Импортируйте ваш репозиторий
-3. В разделе Environment Variables добавьте:
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_CHAT_ID`
-4. Нажмите Deploy
+### Пошаговая инструкция по деплою на Cloudflare:
 
-### Другие хостинги (VPS, Docker, etc)
-Для самостоятельного хостинга:
-\`\`\`bash
-npm run build
-npm run start
-\`\`\`
+1. Зарегистрируйтесь на [Cloudflare](https://dash.cloudflare.com/sign-up) и перейдите в раздел **Workers & Pages**.
+2. Нажмите **Create application** -> перейдите на вкладку **Pages** -> выберите **Connect to Git**.
+3. Подключите свой GitHub/GitLab и выберите репозиторий с этим проектом.
+4. В разделе **Set up builds and deployments** заполните настройки ТОЧНО так:
+   - **Framework preset:** `Next.js`
+   - **Build command:** `npm run pages:build` (ВАЖНО! Не просто `npm run build`)
+   - **Build output directory:** `.vercel/output/static`
+5. Внизу в разделе **Environment variables (advanced)** добавьте две переменные:
+   - `TELEGRAM_BOT_TOKEN` = (ваш токен бота)
+   - `TELEGRAM_CHAT_ID` = (ваш ID чата)
+6. Нажмите **Save and Deploy**.
+
+> ⚠️ **Возможная ошибка при первом деплое:**
+> Если вы видите ошибку `Error: Failed to build` или 404 страницу (как на скриншоте `chrome-error://chromewebdata/`), убедитесь, что:
+> 1. В `package.json` есть скрипт `"pages:build": "npx @cloudflare/next-on-pages"`.
+> 2. Build output directory в настройках Cloudflare установлен именно на `.vercel/output/static`.
+> 3. В файле `src/app/api/lead/route.ts` прописано `export const runtime = 'edge';`.
